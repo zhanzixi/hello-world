@@ -31,6 +31,9 @@ cat <<EOF | sudo tee /etc/docker/daemon.json
   "registry-mirrors": ["http://hub-mirror.c.163.com"]
 }
 EOF
+
+# example mysql5.7
+docker run --name mysql5.7 -e MYSQL_ROOT_PASSWORD=MyNewPass4! -d -p 3306:3306 mysql:5.7.31 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max_connections=1000
 ```
 
 
@@ -507,16 +510,17 @@ sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 #sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 sudo yum install -y kubelet-1.18.2 kubeadm-1.18.2 kubectl-1.18.2 --disableexcludes=kubernetes
 #sudo yum install -y kubelet-1.19.1 kubeadm-1.19.1 kubectl-1.19.1 --disableexcludes=kubernetes
+#sudo yum install -y kubelet-1.19.0 kubeadm-1.19.0 kubectl-1.19.0 --disableexcludes=kubernetes
 
 sudo systemctl enable --now kubelet
 
 # 6. Creating a single control-plane cluster with kubeadm (这一步只在master执行)
 # Initializing your control-plane node
 kubeadm init \
---apiserver-advertise-address 192.168.96.10 \
+--apiserver-advertise-address 192.168.220.16 \
 --pod-network-cidr 10.244.0.0/16 \
 --image-repository registry.aliyuncs.com/google_containers \
---kubernetes-version v1.19.1
+--kubernetes-version v1.19.0
 
 
 mkdir -p $HOME/.kube
@@ -537,6 +541,14 @@ kubeadm join 192.168.96.10:6443 --token 342ln0.gnihyw41wyhhaj9w \
     
 kubeadm join 192.168.96.10:6443 --token fuomq6.wskgus1agi2axy3z \
     --discovery-token-ca-cert-hash sha256:2199944ed6ca978eddb174e991595740f22b047c07ca1a332aa8b39923b0e925
+    
+kubeadm join 192.168.220.16:6443 --token 5roybd.8btb6kjw9z28gnhq \
+    --discovery-token-ca-cert-hash sha256:5fbf246a2a8f6323471aee1ec8d12a0ead3277710e9808f6642e83b6d1aa438a
+
+kubeadm join 192.168.220.16:6443 --token 1n9k6j.8ritutnllll5irdh \
+    --discovery-token-ca-cert-hash sha256:5fbf246a2a8f6323471aee1ec8d12a0ead3277710e9808f6642e83b6d1aa438a
+    1n9k6j.8ritutnllll5irdh
+    5fbf246a2a8f6323471aee1ec8d12a0ead3277710e9808f6642e83b6d1aa438a
 ```
 
 ### ingress-nginx
