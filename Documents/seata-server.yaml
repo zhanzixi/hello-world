@@ -1,16 +1,13 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: seata-server
-  namespace: default
-  labels:
-    app: seata-server
-spec:
-  type: NodePort
-  ports:
-    - port: 8091
-  selector:
-    app: seata-server
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: seata-server
+#   namespace: default
+# spec:
+#   ports:
+#     - port: 8091
+#   selector:
+#     app: seata-server
 
 ---
 
@@ -66,7 +63,7 @@ metadata:
   name: seata-server
   namespace: default
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: seata-server
