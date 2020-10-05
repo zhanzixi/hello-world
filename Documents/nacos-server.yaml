@@ -3,11 +3,11 @@ kind: Service
 metadata:
   name: nacos
 spec:
-  ports:
-    - port: 8848
+  type: NodePort
   selector:
     app: nacos
-  type: NodePort
+  ports:
+    - port: 8848
 
 ---
 
