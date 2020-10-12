@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oms
+  template:
+    metadata:
+      labels:
+        app: oms
+    spec:
+      containers:
+      - name: app
+        image: 172.30.37.192/cqss-dq-otms/oms:latest
+        env:
+        - name: spring.cloud.nacos.discovery.server-addr
+          value: "nacos.default.svc.cluster.local:8848"
+        - name: spring.cloud.nacos.discovery.namespace
+          value: "70aecda0-1a89-4c88-b8b1-e94a29a09f57"
+        - name: seata.registry.nacos.server-addr
+          value: "nacos.default.svc.cluster.local:8848"
+        - name: seata.registry.nacos.namespace
+          value: "70aecda0-1a89-4c88-b8b1-e94a29a09f57"
+      imagePullSecrets:
+      - name: harbor-secret

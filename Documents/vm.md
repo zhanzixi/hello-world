@@ -468,7 +468,8 @@ cat > /etc/docker/daemon.json <<EOF
   "storage-driver": "overlay2",
   "storage-opts": [
     "overlay2.override_kernel_check=true"
-  ]
+  ],
+  "insecure-registries": ["172.30.37.192"]
 }
 EOF
 
@@ -558,6 +559,17 @@ kubeadm join 192.168.220.16:6443 --token 1n9k6j.8ritutnllll5irdh \
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.30.0/deploy/static/mandatory.yaml
 
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.30.0/deploy/static/provider/baremetal/service-nodeport.yaml
+```
+
+### Harbor
+
+```shell
+kubectl create secret docker-registry regsecret --docker-server=registry.cn-hangzhou.aliyuncs.com --docker-username=yin32167@aliyun.com --docker-password=xxxxxx --docker-email=yin32167@aliyun.com
+
+kubectl create secret docker-registry NAME --docker-username=user --docker-password=password
+--docker-email=email [--docker-server=string] [--from-literal=key1=value1]
+
+kubectl create secret docker-registry harbor-secret --docker-server=172.30.37.192 --docker-username=cqss_harbor --docker-password=harborcqssQWE123 --docker-email=cqss_harbor@cqssmail.com
 ```
 
 
