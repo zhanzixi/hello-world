@@ -130,12 +130,13 @@ source /etc/profile
 ```shell
 wget https://mirrors.bfsu.edu.cn/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
 tar zxvf apache-maven-3.6.3-bin.tar.gz -C /usr/local/
-vim /etc/profile.d/maven.sh
 
+cat > /etc/profile.d/maven.sh <<\EOF
 #!/bin/bash
 M2_HOME=/usr/local/apache-maven-3.6.3
 PATH=$M2_HOME/bin:$PATH
 export M2_HOME PATH
+EOF
 
 source /etc/profile
 ```
@@ -518,7 +519,7 @@ sudo systemctl enable --now kubelet
 # 6. Creating a single control-plane cluster with kubeadm (这一步只在master执行)
 # Initializing your control-plane node
 kubeadm init \
---apiserver-advertise-address 192.168.220.16 \
+--apiserver-advertise-address 192.168.96.10 \
 --pod-network-cidr 10.244.0.0/16 \
 --image-repository registry.aliyuncs.com/google_containers \
 --kubernetes-version v1.19.0
@@ -570,6 +571,19 @@ kubectl create secret docker-registry NAME --docker-username=user --docker-passw
 --docker-email=email [--docker-server=string] [--from-literal=key1=value1]
 
 kubectl create secret docker-registry harbor-secret --docker-server=172.30.37.192 --docker-username=cqss_harbor --docker-password=harborcqssQWE123 --docker-email=cqss_harbor@cqssmail.com
+```
+
+### Helm
+
+```shell
+wget https://get.helm.sh/helm-v3.3.4-linux-amd64.tar.gz
+tar -zxvf helm-v3.3.4-linux-amd64.tar.gz
+mv linux-amd64/helm /usr/local/bin/helm
+# 自动补全
+yum install -y bash-completion
+source /usr/share/bash-completion/bash_completion
+source <(helm completion bash)
+echo 'source <(helm completion bash)' > /etc/profile.d/helm.sh
 ```
 
 
