@@ -162,6 +162,11 @@ chown -R tomcat:tomcat /usr/local/apache-tomcat-9.0.8
 # 配置邮件
 # 配置gitlab授权 / 配置免密登录
 
+#####################
+# 1. https://www.jenkins.io/download/ 下载jenkins.war
+# 2. Unlocking Jenkins
+# 3. 安装插件，如果报错添加相应的插件到/root/.jenkins/war/WEB-INF/detached-plugins，重启，如报错强制刷新页面
+
 ```
 
 ## Nginx
@@ -584,6 +589,21 @@ yum install -y bash-completion
 source /usr/share/bash-completion/bash_completion
 source <(helm completion bash)
 echo 'source <(helm completion bash)' > /etc/profile.d/helm.sh
+
+mvn -P test dockerfile:build dockerfile:push -Ddockerfile.tag=v2
+mvn -P test dockerfile:build dockerfile:push -Ddockerfile.tag=v2
+mvn -P test-oms dockerfile:build dockerfile:push
+
+1fbe774145a6
+
+
+docker run -e PARAMS="--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/xxl_job?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai" -p 8080:8080 -v /tmp:/data/applogs --name xxl-job-admin  -d xuxueli/xxl-job-admin:{指定版本}
+
+docker run -e spring.datasource.url="jdbc:mysql://172.30.37.30:3326/xxl_job?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai" \
+-e spring.datasource.username="root" \
+-e spring.datasource.password="yzl8qgYaFjJ4mBlU" \
+-p 8080:8080 --name xxl-job-admin -d 1fbe774145a6
+
 ```
 
 
