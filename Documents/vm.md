@@ -1,5 +1,7 @@
 # 软件安装
 
+
+
 ## Docker
 
 ```shell
@@ -35,6 +37,20 @@ EOF
 # example mysql5.7
 docker run --name mysql5.7 -e MYSQL_ROOT_PASSWORD=MyNewPass4! -d -p 3306:3306 mysql:5.7.31 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max_connections=1000
 ```
+
+
+
+## Docker Compose
+
+```shell
+curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+chmod +x /usr/local/bin/docker-compose
+
+docker-compose --version
+```
+
+
 
 
 
@@ -778,7 +794,7 @@ git rm -rf --cached 文件夹 # 提柜删除该文件夹的所有东西
 # Shell Programming
 
 1. Remember, the shell performs variable substitution *before* it executes the command 
-2. It turns out that the shell does not perform filename substitution when assigning values to variables. Therefore, **x=\***assigns the single character * to x. 
+2. It turns out that the shell does not perform filename substitution when assigning values to variables. Therefore, **x=\* **assigns the single character * to x. 
 3. This order of evaluation is important. Remember, first the shell does ***variable substitution***, then does ***filename substitution***, and then parses the line into arguments.
 4. There are also quite a few functions applicable to variables within this curly brace notation, including extracting subsets, assigning values if the variable is currently unassigned, and more. 
 5. But because filename substitution is *not* done inside double quotes, * is then safely passed to echo as the value to be displayed
@@ -790,6 +806,20 @@ git rm -rf --cached 文件夹 # 提柜删除该文件夹的所有东西
 11. That is, you can use the same special characters for specifying the patterns in a case as you can with filename substitution. For example, ? can be used to specify any single character; * can be used to specify zero or more occurrences of any character; and [...] can be used to specify any single character enclosed between the brackets
 12. the shell treats loops as if they were mini-programs of their own, so whatever appears after block closing statements like done, fi and esac can have redirects, be put into background with the ampersand or even form part of a pipeline of commands
 13. The notation >& specifies output redirection to a file associated with the *file descriptor* that follows. 
+14. The Unix system recognizes only three basic types of files: ***ordinary files***, ***directory files***, and ***special files***.  
+15. or you can specify the particular file by its ***pathname***  
+16. The term ***filter*** is often used in Unix terminology to refer to any program that can take input from standard input, perform some operation on that input, and write the results to standard output  
+17. The Unix system is logically divided into two different areas: the ***kernel*** and the ***utilities***  
+
+```shell
+command 2> file
+date; pwd
+# The standard output from the command will still be directed to your terminal
+sort bigdata > out & 
+ps -f
+```
+
+
 
 # MySQL实战45讲
 
@@ -898,3 +928,13 @@ c3()->e
 
 
 
+
+
+```/
+/salesStockOut/truck
+/sales-reservations/transit-loaded-notices
+SalesReservationServiceImpl.update  SalesReservation.State.TRANSIT_LOADED
+
+/salesStockOut/departure
+/sales-reservations/in-transited-notices SalesReservation.State.IN_TRANSIT
+```
