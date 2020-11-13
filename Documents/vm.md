@@ -798,18 +798,20 @@ git rm -rf --cached 文件夹 # 提柜删除该文件夹的所有东西
 3. This order of evaluation is important. Remember, first the shell does ***variable substitution***, then does ***filename substitution***, and then parses the line into arguments.
 4. There are also quite a few functions applicable to variables within this curly brace notation, including extracting subsets, assigning values if the variable is currently unassigned, and more. 
 5. But because filename substitution is *not* done inside double quotes, * is then safely passed to echo as the value to be displayed
-6. When a backslash is the last character of a line of input, the shell treats it as a line continuation character
-7. back quote: its purpose is to tell the shell to replace the enclosed command with its output
-8. preferred $(...) construct for ***command substitution***
-9. These special variables—more formally known as ***positional parameters*** because they’re based on the position of the value in the command line—are assigned after the shell has done its normal command-line processing (that is, I/O redirection, variable substitution, filename substitution, and so on).
-10. you can use the exec command to *replace the* *current program* (db) *with the new one* (/bin/sh). This means that it would now be pointless to have any commands follow the exec because they’ll never be executed.
-11. That is, you can use the same special characters for specifying the patterns in a case as you can with filename substitution. For example, ? can be used to specify any single character; * can be used to specify zero or more occurrences of any character; and [...] can be used to specify any single character enclosed between the brackets
-12. the shell treats loops as if they were mini-programs of their own, so whatever appears after block closing statements like done, fi and esac can have redirects, be put into background with the ampersand or even form part of a pipeline of commands
-13. The notation >& specifies output redirection to a file associated with the *file descriptor* that follows. 
-14. The Unix system recognizes only three basic types of files: ***ordinary files***, ***directory files***, and ***special files***.  
-15. or you can specify the particular file by its ***pathname***  
-16. The term ***filter*** is often used in Unix terminology to refer to any program that can take input from standard input, perform some operation on that input, and write the results to standard output  
-17. The Unix system is logically divided into two different areas: the ***kernel*** and the ***utilities***  
+6. Functionally, the backslash (used as a prefix) is equivalent to placing single quotes around a single character, though with a few minor exceptions.   
+7. When a backslash is the last character of a line of input, the shell treats it as a line continuation character
+8. There are two ways in the shell to perform command substitution: by enclosing the command in back quotes or surrounding it with the $(...) construct.  
+9. back quote: its purpose is to tell the shell to replace the enclosed command with its output
+10. preferred $(...) construct for ***command substitution***
+11. These special variables—more formally known as ***positional parameters*** because they’re based on the position of the value in the command line—are assigned after the shell has done its normal command-line processing (that is, I/O redirection, variable substitution, filename substitution, and so on).
+12. you can use the exec command to *replace the* *current program* (db) *with the new one* (/bin/sh). This means that it would now be pointless to have any commands follow the exec because they’ll never be executed.
+13. That is, you can use the same special characters for specifying the patterns in a case as you can with filename substitution. For example, ? can be used to specify any single character; * can be used to specify zero or more occurrences of any character; and [...] can be used to specify any single character enclosed between the brackets
+14. the shell treats loops as if they were mini-programs of their own, so whatever appears after block closing statements like done, fi and esac can have redirects, be put into background with the ampersand or even form part of a pipeline of commands
+15. The notation >& specifies output redirection to a file associated with the *file descriptor* that follows. 
+16. The Unix system recognizes only three basic types of files: ***ordinary files***, ***directory files***, and ***special files***.  
+17. or you can specify the particular file by its ***pathname***  
+18. The term ***filter*** is often used in Unix terminology to refer to any program that can take input from standard input, perform some operation on that input, and write the results to standard output  
+19. The Unix system is logically divided into two different areas: the ***kernel*** and the ***utilities***  
 
 ```shell
 command 2> file
@@ -817,6 +819,15 @@ date; pwd
 # The standard output from the command will still be directed to your terminal
 sort bigdata > out & 
 ps -f
+cut -cchars file
+paste files
+sed command file
+tr from-chars to-chars
+grep pattern files
+lines=one'
+'two
+echo "$lines"
+echo "\ is the backslash character"
 ```
 
 
