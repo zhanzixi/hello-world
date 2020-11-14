@@ -673,6 +673,21 @@ cd filebeat-7.9.0-linux-x86_64
 
 ```
 
+## Gitea
+
+```shell
+CREATE USER 'gitea'@'%' IDENTIFIED BY 'Gitea01!';
+CREATE DATABASE giteadb CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';
+GRANT ALL PRIVILEGES ON giteadb.* TO 'gitea'@'%';
+FLUSH PRIVILEGES;
+
+wget -O gitea https://dl.gitea.io/gitea/1.12.5/gitea-1.12.5-linux-amd64
+chmod +x gitea
+./gitea web
+# 管理员 zhanzixi/1981422 1987295689@qq.com
+# james/James01!
+```
+
 
 
 # 韩顺平Linux视频教程2018版
