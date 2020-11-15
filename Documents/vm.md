@@ -670,8 +670,9 @@ server.host: "0.0.0.0"
 ```shell
 tar -xzf filebeat-7.9.0-linux-x86_64.tar.gz
 cd filebeat-7.9.0-linux-x86_64
-
 ```
+
+
 
 ## Gitea
 
@@ -687,6 +688,26 @@ chmod +x gitea
 # 管理员 zhanzixi/1981422 1987295689@qq.com
 # james/James01!
 ```
+
+
+
+## Rancher
+
+```shell
+# 确保docker环境
+sudo docker run --privileged -d --restart=unless-stopped -p 80:80 -p 443:443 rancher/rancher
+
+# https://rancher.com/docs/os/v1.x/en/networking/proxy-settings/
+sudo docker run --privileged -d --restart=unless-stopped -p 80:80 -p 443:443 -e NO_PROXY="localhost,127.0.0.1" rancher/rancher
+
+# https://docs.docker.com/engine/reference/run/
+# unless-stopped	Always restart the container regardless of the exit status, including on daemon startup, except if the container was put into a stopped state before the Docker daemon was stopped.
+
+# 设置密码 admin/admin
+
+```
+
+
 
 
 
