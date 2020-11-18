@@ -868,6 +868,7 @@ git rm -rf --cached 文件夹 # 提柜删除该文件夹的所有东西
 17. or you can specify the particular file by its ***pathname***  
 18. The term ***filter*** is often used in Unix terminology to refer to any program that can take input from standard input, perform some operation on that input, and write the results to standard output  
 19. The Unix system is logically divided into two different areas: the ***kernel*** and the ***utilities***  
+20. Recall that the -o option to sort specifies where the sorted output is to be written, and that this can be the same as the input file
 
 ```shell
 command 2> file
@@ -884,6 +885,8 @@ lines=one'
 'two
 echo "$lines"
 echo "\ is the backslash character"
+sort -o phonebook phonebook
+sed "/$1/d" phonebook > /tmp/phonebook
 ```
 
 
