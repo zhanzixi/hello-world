@@ -606,6 +606,9 @@ source /usr/share/bash-completion/bash_completion
 source <(helm completion bash)
 echo 'source <(helm completion bash)' > /etc/profile.d/helm.sh
 
+helm repo add stable https://charts.helm.sh/stable
+helm search repo stable
+
 mvn -P test dockerfile:build dockerfile:push -Ddockerfile.tag=v2
 mvn -P test dockerfile:build dockerfile:push -Ddockerfile.tag=v2
 mvn -P test-oms dockerfile:build dockerfile:push
@@ -698,13 +701,30 @@ chmod +x gitea
 sudo docker run --privileged -d --restart=unless-stopped -p 80:80 -p 443:443 rancher/rancher
 
 # https://rancher.com/docs/os/v1.x/en/networking/proxy-settings/
-sudo docker run --privileged -d --restart=unless-stopped -p 80:80 -p 443:443 -e NO_PROXY="localhost,127.0.0.1" rancher/rancher
+sudo docker run --privileged -d --restart=unless-stopped -p 80:80 -p 443:443 -e NO_PROXY="localhost,127.0.0.1" rancher/rancher:v2.5.2
 
 # https://docs.docker.com/engine/reference/run/
 # unless-stopped	Always restart the container regardless of the exit status, including on daemon startup, except if the container was put into a stopped state before the Docker daemon was stopped.
 
 # 设置密码 admin/admin
 
+```
+
+* You can install Rancher on a single node, or on a high-availability Kubernetes cluster.
+* 
+
+
+
+## Istio
+
+```shell
+tar xzf istio-1.7.4-linux-amd64.tar.gz
+cd istio-1.7.4
+cp bin/istioctl /usr/bin
+
+
+istioctl install --set profile=demo
+kubectl label namespace default istio-injection=enabled
 ```
 
 
@@ -887,101 +907,3 @@ show processlist
 eyJhbGciOiJIUzUxMiJ9.eyJsb2dpbl91c2VyX2tleSI6IjNlNmM2ZTRhLWQyNzQtNGY1ZC05ODRlLWRkNjYyN2I2YTA3NiJ9.ZSwFhbW_UuMDRaIudwP7WWkHkF4tXPmoJhbR54AbjeDXMdYAzRFcY7sPNiNws1hoSQxuWzgrAndA1sbAN4s85Q
 
 # MD 例子
-
-啊手动阀
-asdfasdf
-asdfasdf
-
-asdfadsf
-
-# 1
-
-## 2
-
-### 3
-
-#### 4
-
-##### 5
-
-###### 6
-
-> ads
-
-* asf
-* asdf
-* asdf
-
-1. asdf
-2. 2
-
-- [ ] bbb
-- [x] ccc
-
-```yam
----
-
-```
-
-```sequence
-participant Alice
-participant Bob
-
-Alice->Bob: Hello Bob, how are you?
-Note right of Bob: Bob think
-Bob-->Alice: I am good thanks!
-Alice->>Bob: aaa
-
-
-```
-
-```sequence
-participant TM
-participant RM1
-# participant TC
-
-Note left of TM: 发起全局事务(@GlobalTransactional)
-Note left of TM: 执行本地事务(可选)
-TM->RM1: 调用其他微服务
-Note right of RM1: 执行业务
-RM1-->TM: 返回执行结果
-Note left of TM: 如果返回结果显示执行错误，则抛异常，回滚全局事务
-Note left of TM: 执行本地事务(可选)
-Note left of TM: 如果本地事务错误，则抛异常，回滚全局事务
-
-```
-
-```flow
-st=>start: index
-op=>operation: 申请
-op2=>operation: 结果页
-op3=>operation: 查询本地
-i1=>inputoutput: bid入库
-i2=>inputoutput: 填写个人信息
-c1=>condition: 检查登录
-c2=>condition: 登录
-c3=>condition: 查询本地记录
-c4=>condition: 检测状态
-c5=>operation: 风控审核
-e=>end
-
-st->op->c1()
-c1(no)->c2(yes)->op()
-c1(yes)->c3(no)->i1(right)->i2(right)->c5()->op2->e
-c1(yes)->c3(yes)->c4(no)->i2
-c1(yes)->c3(yes)->c4(yes)->op3->op2
-c3()->e
-```
-
-
-
-
-
-```/
-/salesStockOut/truck
-/sales-reservations/transit-loaded-notices
-SalesReservationServiceImpl.update  SalesReservation.State.TRANSIT_LOADED
-
-/salesStockOut/departure
-/sales-reservations/in-transited-notices SalesReservation.State.IN_TRANSIT
-```
