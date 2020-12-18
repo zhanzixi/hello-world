@@ -729,6 +729,37 @@ kubectl label namespace default istio-injection=enabled
 
 
 
+## etcd
+
+```shell
+tar xzf etcd-v3.4.0-linux-amd64.tar.gz
+cd etcd-v3.4.0-linux-amd64/
+./etcd -h
+
+--listen-peer-urls 'http://localhost:2380'
+List of URLs to listen on for peer traffic.
+--listen-client-urls 'http://localhost:2379'
+List of URLs to listen on for client traffic.
+
+./etcd --listen-client-urls http://127.0.0.1:12379 --advertise-client-urls http://127.0.0.1:12379 --listen-peer-urls http://127.0.0.1:12380 --logger=zap
+./etcdctl --endpoints=127.0.0.1:12379 put foo bar
+./etcdctl --endpoints=127.0.0.1:12379 get foo
+
+```
+
+
+
+## NPM
+
+```shell
+npm config set registry https://registry.npmjs.org/
+npm config set registry https://registry.npm.taobao.org/
+
+# The npm registry contains packages, many of which are also Node modules, or contain Node modules
+```
+
+
+
 
 
 # 韩顺平Linux视频教程2018版
@@ -869,6 +900,50 @@ git rm -rf --cached 文件夹 # 提柜删除该文件夹的所有东西
 18. The term ***filter*** is often used in Unix terminology to refer to any program that can take input from standard input, perform some operation on that input, and write the results to standard output  
 19. The Unix system is logically divided into two different areas: the ***kernel*** and the ***utilities***  
 20. Recall that the -o option to sort specifies where the sorted output is to be written, and that this can be the same as the input file
+21. In a pipeline, the exit status reflects the last command in the pipe  
+22. The shell variable ***$?*** is automatically set by the shell to the exit status of the last command executed.   
+23. To avoid this sort of problem, many shell programmers write their test commands as **test X"$symbol" = X **which will be true if symbol is null, and false if it’s not. The X in front of symbol prevents test from interpreting the characters stored in symbol as an operator  
+24. This is a good point to introduce the shell’s ***-x*** option.  
+25. The symbol ***|*** has the effect of a logical OR when used between two patterns.  
+26. This time, let’s take advantage of the fact that date with the ***+%H*** option writes a two-digit hour to standard output.  
+27. With the shell’s built-in null command. The format of this command is simply **:** and the purpose of it is—you guessed it—to do nothing.  
+28. The shell permits filename substitution in the list of words in the for statement.
+29. The shell replaces the value of $* with $1, $2, … , but if you instead use the special shell variable "***$@***" the values will be passed with "$1", "$2", … . The key difference is the double quotes around the $@: without them this variable behaves just like $*.  
+30. By default, all your processes are automatically terminated when you log off the system. If you want a program to continue running after you’ve logged off, you can run it with the ***nohup*** command, or schedule it to run with at or from cron.  
+31. In these situations the command ***true*** can be used to return an exit status of zero. The command ***false*** can be used in the opposite situation too, as it returns a nonzero exit status.  
+32. If the break command is used in the form ***break n*** the n innermost loops are immediately exited.
+33. ***continue n*** causes the commands in the innermost n loops to be skipped, after which execution of the program continues as normal.  
+34. This—and subsequent examples—work because the shell treats loops as if they were mini-programs of their own, so whatever appears after block closing statements like ***done***, ***fi*** and ***esac*** can have redirects, be put into background with the ampersand or even form part of a pipeline of commands.  
+35. Individual statements can override block redirection, just as any other statements in your shell programs can explicitly read from a specified source or send output to a specified destination.  
+36. To force input or output to come from or go to the terminal, utilize ***/dev/tty***, which always refers to your terminal program, whether you’re on a Mac, Linux, or Unix system.  
+37. Don’t fret, though; the shell provides a built-in command called ***getopts*** that makes it easy to process command line arguments. The general format of the command is ***getopts options variable***  
+38. The ***basename*** command gives the base filename of its argument with all directory components stripped away (for example, basename /usr/bin/troff produces troff; basename troff also produces troff).  
+39. The seemingly weird behavior exhibited by vartest and vartest2 is due to the fact that these programs are run within ***subshells*** by your login shell.  A subshell is essentially an entirely new shell just to run the desired program.  
+40. There is a way to make the value of a variable known to a subshell, and that’s by exporting it with the ***export*** command. The format of this command is simply  ***export variables***  
+41. There is no way to change the value of a variable in a parent shell from within a subshell.  
+42. After a variable is exported, it remains exported to all subshells subsequently executed.  
+43. (pronounced “dot”) whose general format is ***. file*** and whose purpose is to execute the contents of file in the current shell.  
+44. This means that it would now be pointless to have any commands follow the exec because they’ll never be executed.  
+45. The format is a bit more general than that shown, actually, because you can assign several variables at once using the format
+    ***variable=value variable=value ...***  
+46. ***${parameter:-value}*** This construct says to use the value of parameter if it is not null, and to substitute value otherwise.  
+47. ***${parameter:=value}*** This version is similar to the previous, but if parameter is null not only is value used, but it is also assigned to parameter as well (note the = in the construct).  You can’t assign values to positional parameters this way, however, so that means that parameter can’t be a number.  
+48. ***${parameter:?value}*** If parameter is not null, the shell substitutes its value; otherwise, the shell writes value to standard error and then exits  
+49. ***${parameter:+value}*** This one substitutes value if parameter is not null; otherwise, it substitutes nothing. It’s the opposite of :-  
+50. Sometimes you may want to remove the definition of a variable from your environment. To do so, you type ***unset*** followed by the names of the variables  
+51. When you put ***eval*** in front of it, however, the effect is that the shell scans the command line ***twice*** before executing it，Its format is as follows: ***eval command-line***  
+52. Its general format is ***wait process-id***  where process-id is the process ID of the process you want to complete. If the process ID is omitted, the shell waits for all child processes to complete execution.  
+53. Signal handling in a shell program is done with the trap command, whose general format is ***trap commands signals***  
+54. If the command listed for trap is null, the specified signal will be ignored when received. For example, the command ***trap "" SIGINT***  specifies that the interrupt signal is to be ignored.  If you ignore a signal, all subshells also ignore that signal. If you specify a signal handler action, however, all subshells will automatically take the default action on receipt of that signal, not
+    the new code sequence.  
+55. You also know that you can redirect standard error from any command simply by writing 2> instead of just >:
+    ***command 2> file***  
+56. ***command >&2*** The notation >& specifies output redirection to a file associated with the file descriptor that
+    follows. File descriptor 0 is standard input, descriptor 1 is standard output, and descriptor 2 is standard error. It’s important to remember that no space is permitted between the > and the &.  
+57. The sequence ***>&-*** has the effect of closing standard output.  
+58. One of the best uses of the ***in-line input redirection*** feature is for creating ***shell archive*** files.  
+59. To define a function, you use the general format: ***name () { command; ... command; }***  
+60. One key feature: arguments listed after the function on the command line are assigned to the positional parameters $1, $2, ..., within the function, just as with any other command.  
 
 ```shell
 command 2> file
@@ -887,9 +962,47 @@ echo "$lines"
 echo "\ is the backslash character"
 sort -o phonebook phonebook
 sed "/$1/d" phonebook > /tmp/phonebook
+[ -z "$EDITOR" ] && EDITOR=/bin/ed
+grep "$name" phonebook || echo "Couldn't find $name"
+while [ "$endofdata" -ne TRUE ]
+do
+...
+done 2> errors
+echo "Error: no file" 1>&2
+
+x=100 y=200 z=50
+echo $x $y $z
+: ${PHONEBOOK:=$HOME/phonebook}
+${variable%pattern}
+${variable%%pattern}
+${variable#pattern}
+${variable##pattern}
+
+set one two three four
+echo $1:$2:$3:$4
+command 2> file
+command >&2
+command > foo 2>> foo
+command > foo 2>&1
+exec < datafile
+exec > /tmp/output
+exec 2> /tmp/errors
+ls >&-
+command <<word
 ```
 
+# Go
 
+```powershell
+go env
+# GOPROXY=https://proxy.golang.org,direct
+go env -w GOPROXY=https://goproxy.cn,direct
+```
+
+- Go code is grouped into packages, and packages are grouped into modules.
+- Declare a `main` package. In Go, code executed as an application must go in a `main` package.
+- The `replace` directive tells Go where to find the `greetings` module, because it isn't published yet.
+- To reference a published module, a go.mod file would omit the `replace` directive and use a `require` directive with a tagged version number at the end.
 
 # MySQL实战45讲
 
