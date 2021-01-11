@@ -625,9 +625,15 @@ docker run -e spring.datasource.url="jdbc:mysql://172.30.37.30:3326/xxl_job?useU
 
 ```
 
+### Kubernetes in Action
 
+- By default, the default-token Secret is mounted into every container, but you can disable that in each pod by setting the automountServiceAccountToken field in the pod spec to false or by setting it to false on the service account the pod is using.   
 
-
+- For now, all you need to know is that a service account is the account that the pod authenticates as when talking to the API server.  
+- This also explains why labels and annotations can’t be exposed through environment variables. Because environment
+  variable values can’t be updated afterward, if the labels or annotations of a pod were exposed through environment variables, there’s no way to expose the new values after they’re modified.  
+- Using volumes to expose a container’s resource requests and/or limits is slightly more complicated than using environment variables, but the benefit is that it allows you to pass one container’s resource fields to a different container if needed (but
+  both containers need to be in the same pod). With environment variables, a container can only be passed its own resource limits and requests.  
 
 
 
@@ -725,6 +731,29 @@ cp bin/istioctl /usr/bin
 
 istioctl install --set profile=demo
 kubectl label namespace default istio-injection=enabled
+```
+
+```yaml
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: reviews
+spec:
+  hosts:
+  - reviews # 1
+  http:
+  - match:
+    - headers:
+        end-user:
+          exact: jason
+    route:
+    - destination:
+        host: reviews
+        subset: v2
+  - route:
+    - destination:
+        host: reviews
+        subset: v3
 ```
 
 
@@ -990,6 +1019,18 @@ exec 2> /tmp/errors
 ls >&-
 command <<word
 ```
+
+# Netty
+
+* 104.18.49.137 www.allitebooks.com
+  104.18.49.137 file.allitebooks.com
+* Netty’s primary building blocks: ***Channels***, ***Callbacks***, ***Futures***, ***Events*** and ***handlers***  
+  * think of a Channel as a vehicle for incoming (inbound) and outgoing (outbound) data.   
+  * Netty uses callbacks internally when handling events; when a callback is triggered the event can be handled by an implementation of interface ***ChannelHandler***.  
+  * This is quite cumbersome, so Netty provides its own implementation, ***ChannelFuture***, for use when an asynchronous operation is executed.  ChannelFuture provides additional methods that allow us to register one or more ***ChannelFutureListener*** instances.   
+  * Netty provides an extensive set of predefined handlers that you can use out of the box, including handlers for protocols such as HTTP and SSL/TLS.   
+* Under the covers, an ***EventLoop*** is assigned to each Channel to handle all of the events  
+* The EventLoop itself is driven by only one thread that handles all of the I/O events for one Channel and does not change during the lifetime of the EventLoop.  
 
 # Go
 
