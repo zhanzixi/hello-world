@@ -627,13 +627,56 @@ docker run -e spring.datasource.url="jdbc:mysql://172.30.37.30:3326/xxl_job?useU
 
 ### Kubernetes in Action
 
+- A ReplicaSet behaves exactly like a ReplicationController, but it has more expressive pod selectors. Whereas a ReplicationController’s label selector only allows matching pods that include a certain label, a ReplicaSet’s selector also allows matching pods that lack a certain label or pods that include a certain label key, regardless of its value.  
 - By default, the default-token Secret is mounted into every container, but you can disable that in each pod by setting the automountServiceAccountToken field in the pod spec to false or by setting it to false on the service account the pod is using.   
-
 - For now, all you need to know is that a service account is the account that the pod authenticates as when talking to the API server.  
 - This also explains why labels and annotations can’t be exposed through environment variables. Because environment
   variable values can’t be updated afterward, if the labels or annotations of a pod were exposed through environment variables, there’s no way to expose the new values after they’re modified.  
 - Using volumes to expose a container’s resource requests and/or limits is slightly more complicated than using environment variables, but the benefit is that it allows you to pass one container’s resource fields to a different container if needed (but
   both containers need to be in the same pod). With environment variables, a container can only be passed its own resource limits and requests.  
+
+```yaml
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: <plural>.<group>
+  name: crontabs.stable.example.com
+spec:
+  # group name to use for REST API: /apis/<group>/<version>
+  group: stable.example.com
+  # list of versions supported by this CustomResourceDefinition
+  versions:
+    - name: v1
+      # Each version can be enabled/disabled by Served flag.
+      served: true
+      # One and only one version must be marked as the storage version.
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                cronSpec:
+                  type: string
+                image:
+                  type: string
+                replicas:
+                  type: integer
+  # either Namespaced or Cluster
+  scope: Namespaced
+  names:
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: crontabs
+    # singular name to be used as an alias on the CLI and for display
+    singular: crontab
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: CronTab
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+    - ct
+```
 
 
 
@@ -724,6 +767,7 @@ sudo docker run --privileged -d --restart=unless-stopped -p 80:80 -p 443:443 -e 
 ## Istio
 
 ```shell
+# https://github.com/istio/istio 下载压缩包
 tar xzf istio-1.7.4-linux-amd64.tar.gz
 cd istio-1.7.4
 cp bin/istioctl /usr/bin
@@ -756,7 +800,12 @@ spec:
         subset: v3
 ```
 
-
+- Like other Istio configuration, the API is specified using Kubernetes custom resource definitions (***CRD***s), which you can configure using YAML
+- ***Virtual services***, along with ***destination rules***, are the key building blocks of Istio’s traffic routing functionality.
+- Route destinations can be versions of the same service or entirely different services.
+- Virtual service hosts don’t actually have to be part of the Istio service registry, they are simply virtual destinations.
+- Routing rules are ***evaluated in sequential order from top to bottom***, with the first rule in the virtual service definition being given highest priority.
+- ou can think of virtual services as how you route your traffic **to** a given destination, and then you use destination rules to configure what happens to traffic **for** that destination.
 
 ## etcd
 
@@ -787,7 +836,18 @@ npm config set registry https://registry.npm.taobao.org/
 # The npm registry contains packages, many of which are also Node modules, or contain Node modules
 ```
 
-
+* The npm registry contains packages, many of which are also Node modules, or contain Node modules.
+* A **package** is a file or directory that is described by a `package.json` file. A package must contain a `package.json` file in order to be published to the npm registry.
+* Packages can be unscoped or scoped to a user or organization, and scoped packages can be private or public. 
+* A **module** is any file or directory in the `node_modules` directory that can be loaded by the Node.js `require()` function.
+* To be loaded by the Node.js `require()` function, a module must be one of the following:
+  - A folder with a `package.json` file containing a `"main"` field.
+  - A JavaScript file.
+* When listed as a dependent in a `package.json` file, scoped packages are preceded by their scope name. The scope name is everything between the `@` and the slash
+* semantic versioning syntax
+  * Patch releases: `1.0` or `1.0.x` or `~1.0.4`
+  * Minor releases: `1` or `1.x` or `^1.0.4`
+  * Major releases: `*` or `x`
 
 
 
