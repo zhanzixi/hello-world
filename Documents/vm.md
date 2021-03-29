@@ -52,8 +52,6 @@ docker-compose --version
 
 
 
-
-
 ## MySQL
 
 ```shell
@@ -78,6 +76,24 @@ GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'MyNewPass4!' WITH GRANT
 SET GLOBAL TRANSACTION ISOLATION LEVEL READ COMMITTED
 ```
 
+
+
+## Redis
+
+```shell
+yum install -y gcc-c++ wget
+
+wget http://download.redis.io/releases/redis-5.0.9.tar.gz
+tar -zxf redis-5.0.9.tar.gz
+
+cd redis-5.0.9
+make
+
+make install PREFIX=/user/local/redis
+```
+
+
+
 ## Git
 
 ```shell
@@ -94,6 +110,8 @@ cd git-2.26.2
 make && make install
 ln -s /usr/local/git-2.26.2/bin/* /usr/bin/
 ```
+
+
 
 ## GitLab
 
@@ -126,6 +144,8 @@ sudo gitlab-ctl reconfigure
 # 3.测试邮件服务是否正常 gitlab-rails console;Notify.test_email('接收方','标题','邮件类容').deliver_now
 ```
 
+
+
 ## Java
 
 ```shell
@@ -140,6 +160,8 @@ export JAVA_HOME PATH
 
 source /etc/profile
 ```
+
+
 
 ## Maven
 
@@ -157,11 +179,15 @@ EOF
 source /etc/profile
 ```
 
+
+
 ## Sonatype Nexus
 
 ```shell
 # 官方网站访问不了oss下载页面
 ```
+
+
 
 ##  Jenkins
 
@@ -184,6 +210,8 @@ chown -R tomcat:tomcat /usr/local/apache-tomcat-9.0.8
 # 3. 安装插件，如果报错添加相应的插件到/root/.jenkins/war/WEB-INF/detached-plugins，重启，如报错强制刷新页面
 
 ```
+
+
 
 ## Nginx
 
@@ -210,6 +238,8 @@ EOF
 
 systemctl enable --now nginx
 ```
+
+
 
 ## Keepalived
 
@@ -309,6 +339,8 @@ if [ `ps -C nginx --no-header | wc -l` -eq 0 ]; then    #如果nginx没有启动
       fi
 fi
 ```
+
+
 
 ## K8S
 
@@ -706,6 +738,8 @@ cluster.initial_master_nodes: ["node-1"]
 
 ```
 
+
+
 ## Kibana
 
 ```shell
@@ -716,6 +750,8 @@ cd kibana-7.9.0-linux-x86_64/
 # config/kibana.yml
 server.host: "0.0.0.0"
 ```
+
+
 
 ## Filebeat
 
@@ -806,6 +842,8 @@ spec:
 - Virtual service hosts don’t actually have to be part of the Istio service registry, they are simply virtual destinations.
 - Routing rules are ***evaluated in sequential order from top to bottom***, with the first rule in the virtual service definition being given highest priority.
 - ou can think of virtual services as how you route your traffic **to** a given destination, and then you use destination rules to configure what happens to traffic **for** that destination.
+
+
 
 ## etcd
 
@@ -1124,3 +1162,21 @@ show processlist
 eyJhbGciOiJIUzUxMiJ9.eyJsb2dpbl91c2VyX2tleSI6IjNlNmM2ZTRhLWQyNzQtNGY1ZC05ODRlLWRkNjYyN2I2YTA3NiJ9.ZSwFhbW_UuMDRaIudwP7WWkHkF4tXPmoJhbR54AbjeDXMdYAzRFcY7sPNiNws1hoSQxuWzgrAndA1sbAN4s85Q
 
 # MD 例子
+
+# 开课吧
+
+```tex
+开课吧晶晶 搬砖ing:
+
+方式：登录https://www.kaikeba.com/cert/student
+输入10位的证书编号，即可查询和下载；
+方式：微信关注"开课吧服务号"，在导航「我的」-「学习证书」中，输入10位的证书编号，即可查询和下载。
+
+开课吧晶晶 搬砖ing:
+OJ6GS5CBDX
+
+
+毕业证书编号： 4C2FP7DNLC
+查询地址：https://www.kaikeba.com/cert/student
+```
+
