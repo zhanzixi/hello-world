@@ -112,6 +112,7 @@ ln -s /usr/local/git-2.26.2/bin/* /usr/bin/
 
 # , you can unstage a file using the Git command “git rm” with the option “--cached.”
 git rm --cached README.md
+
 ```
 
 
