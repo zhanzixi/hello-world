@@ -109,6 +109,9 @@ cd git-2.26.2
 ./configure --prefix=/usr/local/git-2.26.2
 make && make install
 ln -s /usr/local/git-2.26.2/bin/* /usr/bin/
+
+# , you can unstage a file using the Git command “git rm” with the option “--cached.”
+git rm --cached README.md
 ```
 
 
@@ -629,6 +632,7 @@ kubectl create secret docker-registry harbor-secret --docker-server=172.30.37.19
 ### Helm
 
 ```shell
+# https://github.com/helm/helm/releases
 wget https://get.helm.sh/helm-v3.3.4-linux-amd64.tar.gz
 tar -zxvf helm-v3.3.4-linux-amd64.tar.gz
 mv linux-amd64/helm /usr/local/bin/helm
@@ -1149,6 +1153,28 @@ go env -w GOPROXY=https://goproxy.cn,direct
 show processlist
 ```
 
+
+
+## Java并发编程
+
+```tex
+01 | 可见性、原子性和有序性问题：并发编程Bug的源头
+这些年，我们的 CPU、内存、I/O 设备都在不断迭代，不断朝着更快的方向努力。但是，在这个快速发展的过程中，有一个核心矛盾一直存在，就是这三者的速度差异。
+源头之一：缓存导致的可见性问题
+一个线程对共享变量的修改，另外一个线程能够立刻看到，我们称为可见性。
+源头之二：线程切换带来的原子性问题
+我们把一个或者多个操作在 CPU 执行的过程中不被中断的特性称为原子性。
+源头之三：编译优化带来的有序性问题
+只要我们能够深刻理解可见性、原子性、有序性在并发场景下的原理，很多并发 Bug 都是可以理解、可以诊断的。
+在介绍可见性、原子性、有序性的时候，特意提到缓存导致的可见性问题，线程切换带来的原子性问题，编译优化带来的有序性问题，其实缓存、线程、编译优化的目的和我们写并发程序的目的是相同的，都是提高程序性能。
+
+
+```
+
+
+
+
+
 # 学习书籍
 
 ## Docker in Action
@@ -1178,5 +1204,24 @@ OJ6GS5CBDX
 
 毕业证书编号： 4C2FP7DNLC
 查询地址：https://www.kaikeba.com/cert/student
+```
+
+
+
+# VUE
+
+```shell
+vue create ruoyi-ui-james
+
+cd ruoyi-ui-james
+
+vue add router
+vue add vuex
+npm i element-ui
+
+npm i sass sass-loader@10 -D
+npm i axios
+npm i @smallwei/avue
+npm i nprogress
 ```
 
