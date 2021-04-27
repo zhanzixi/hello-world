@@ -134,10 +134,6 @@ git checkout master
 git revert <commit name>
 ```
 
-```tex
-aaa
-```
-
 
 
 
