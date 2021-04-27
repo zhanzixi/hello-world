@@ -114,6 +114,7 @@ ln -s /usr/local/git-2.26.2/bin/* /usr/bin/
 
 ```tex
 bbb
+aaa
 ```
 
 
@@ -132,6 +133,8 @@ git checkout master
 
 # Whatever changes committed must stay so, for the sake of history; changing what has happened in the past is very dangerous and counterintuitive. Instead, you will use git revert to create a new commit that contains the exact opposite of the commit you are trying to undo.
 git revert <commit name>
+
+ git commit --amend
 ```
 
 
