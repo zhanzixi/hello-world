@@ -110,10 +110,27 @@ cd git-2.26.2
 make && make install
 ln -s /usr/local/git-2.26.2/bin/* /usr/bin/
 
+```
+
+
+
+```shell
+# Beginning Git and Github.pdf
+
 # , you can unstage a file using the Git command “git rm” with the option “--cached.”
 git rm --cached README.md
+# To check a snapshot of the project, we use the “git checkout” command and pass the commit name as a parameter.
+git checkout <name>
+# Be careful not to change anything when checking out previous commits. Just like in the movies, changing the past is a very bad idea!
+#  “head” is just a reference to a commit. Instead of saying “name,” when talking about commits, we say “head.”
+# And that’s it! A head is a reference to a commit (there can be multiple heads in a repository), and the head pointing to the currently checked-out commit is called HEAD.
+git checkout master
 
+# Whatever changes committed must stay so, for the sake of history; changing what has happened in the past is very dangerous and counterintuitive. Instead, you will use git revert to create a new commit that contains the exact opposite of the commit you are trying to undo.
+git revert <commit name>
 ```
+
+
 
 
 
