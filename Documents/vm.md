@@ -135,7 +135,15 @@ git checkout master
 git revert <commit name>
 
  git commit --amend
+ 
+ git reset --soft HEAD~1
+ git reset HEAD filenottocommit.txt
+ 
+ # Be careful when you use the reset command. it’s very dangerous. make sure to double check what you write.
+ 
 ```
+
+
 
 
 
@@ -840,6 +848,10 @@ cp bin/istioctl /usr/bin
 
 istioctl install --set profile=demo
 kubectl label namespace default istio-injection=enabled
+
+kubectl label namespace default istio-injection=disabled
+# 卸载
+istioctl manifest generate --set profile=demo | kubectl delete -f -
 ```
 
 ```yaml
@@ -871,6 +883,29 @@ spec:
 - Virtual service hosts don’t actually have to be part of the Istio service registry, they are simply virtual destinations.
 - Routing rules are ***evaluated in sequential order from top to bottom***, with the first rule in the virtual service definition being given highest priority.
 - ou can think of virtual services as how you route your traffic **to** a given destination, and then you use destination rules to configure what happens to traffic **for** that destination.
+
+
+
+## kubevela
+
+```shell
+# Add helm chart repo for KubeVela
+helm repo add kubevela https://kubevelacharts.oss-accelerate.aliyuncs.com/core
+# Update the chart repo
+helm repo update
+# Install KubeVela
+helm install --create-namespace -n vela-system kubevela kubevela/vela-core
+
+# Get KubeVela CLI,网络不好,反复重试
+curl -fsSl https://kubevela.io/script/install.sh | bash
+
+# Enable Helm Support
+helm install --create-namespace -n flux-system helm-flux http://oam.dev/catalog/helm-flux2-0.1.0.tgz
+
+echo 'source <(vela completion bash)' > /etc/profile.d/vela.sh
+```
+
+
 
 
 
