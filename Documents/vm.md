@@ -760,6 +760,7 @@ cd elasticsearch-7.9.0/
 [1]: max file descriptors [4096] for elasticsearch process is too low, increase to at least [65535]
 [2]: max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]
 
+ulimit -n 65535 
 # /etc/security/limits.conf
 *       soft    nofile  65535
 *       hard    nofile  65535
@@ -772,6 +773,9 @@ node.name: node-1
 network.host: 0.0.0.0
 cluster.initial_master_nodes: ["node-1"]
 
+
+./bin/elasticsearch -d -p pid
+pkill -F pid
 
 ```
 
