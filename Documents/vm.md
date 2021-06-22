@@ -89,7 +89,7 @@ tar -zxf redis-5.0.9.tar.gz
 cd redis-5.0.9
 make
 
-make install PREFIX=/user/local/redis
+make install PREFIX=/usr/local/redis
 ```
 
 
@@ -256,10 +256,13 @@ yum -y install gcc gcc-c++ pcre-devel openssl-devel
 ./configure
 make && make install
 
-cat <<EOF | sudo tee /lib/systemd/system/nginx.service
+# https://www.nginx.com/resources/wiki/start/topics/examples/systemd/
+
+cat <<EOF | sudo tee /etc/systemd/system/nginx.service
 [Unit]
 Description=nginx service
 After=network.target 
+Wants=network.target
    
 [Service] 
 Type=forking 
@@ -1197,6 +1200,12 @@ command <<word
   * Netty provides an extensive set of predefined handlers that you can use out of the box, including handlers for protocols such as HTTP and SSL/TLS.   
 * Under the covers, an ***EventLoop*** is assigned to each Channel to handle all of the events  
 * The EventLoop itself is driven by only one thread that handles all of the I/O events for one Channel and does not change during the lifetime of the EventLoop.  
+* By default, a handler will forward the invocation of a handler method to the next one in the chain. Therefore, if exceptionCaught() is not implemented somewhere along the chain, exceptions received will travel to the end of the
+  ChannelPipeline and will be logged. For this reason, your application should supply at least one ChannelHandler that implements exceptionCaught().  
+* Note that the message sent by the server may be received in chunks. That is, if the server sends 5 bytes, there’s no guarantee that all 5 bytes will be received at once. Even for such a small amount of data, the channelRead0() method could be called twice, first with a ByteBuf (Netty’s byte container) holding 3 bytes, and second with a ByteBuf holding 2 bytes. As a stream-oriented protocol, TCP guarantees that the bytes will be received in the order in which they were sent by the server.  
+* in Netty 4 all I/O operations and events are handled by the Thread that has been assigned to the ***EventLoop***  
+* We stated earlier the importance of not blocking the current I/O thread. We’ll say it again in another way: “Never put a long-running task in the execution queue, because it will block any other task from executing on the same thread.”  
+* Once a Channel has been assigned an EventLoop, it will use this EventLoop (and the associated Thread) throughout its lifetime.   
 
 # Go
 
