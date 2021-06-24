@@ -90,6 +90,25 @@ cd redis-5.0.9
 make
 
 make install PREFIX=/usr/local/redis
+
+cp redis.conf /usr/local/redis/bin/
+# 修改/usr/local/redis/bin/redis.conf
+
+## 服务化
+cat > /etc/systemd/system/redis.service <<EOF
+[Unit]
+Description=redis service
+After=network.target 
+Wants=network.target
+   
+[Service] 
+Type=forking 
+ExecStart=/usr/local/redis/bin/redis-server /usr/local/redis/bin/redis.conf
+PrivateTmp=true 
+   
+[Install] 
+WantedBy=multi-user.target
+EOF
 ```
 
 
@@ -252,7 +271,10 @@ chown -R tomcat:tomcat /usr/local/apache-tomcat-9.0.8
 ## Nginx
 
 ```shell
+# https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-open-source/
 yum -y install gcc gcc-c++ pcre-devel openssl-devel
+wget http://nginx.org/download/nginx-1.20.1.tar.gz
+tar -xf nginx-1.20.1.tar.gz
 ./configure
 make && make install
 
@@ -280,15 +302,35 @@ systemctl enable --now nginx
 
 
 
+## Haproxy
+
+```shell
+wget https://www.haproxy.org/download/2.4/src/haproxy-2.4.0.tar.gz
+tar -xf haproxy-2.4.0.tar.gz
+make TARGET=linux-glibc PREFIX=/usr/local/haproxy
+make install PREFIX=/usr/local/haproxy
+
+mkdir /usr/local/haproxy/conf
+cp examples/option-http_proxy.cfg /usr/local/haproxy/conf/haproxy.cfg
+ln -s /usr/local/haproxy/sbin/haproxy /usr/sbin/haproxy
+
+# 配置参考
+# http://cbonte.github.io/haproxy-dconv/2.4/configuration.html#2.6
+```
+
+
+
 ## Keepalived
 
 ```shell
-yum -y gcc openssl-devel libnl3-devel net-snmp-devel
-wget https://www.keepalived.org/software/keepalived-2.0.20.tar.gz
-tar zxf keepalived-2.0.20.tar.gz
-cd keepalived-2.0.20
+yum -y install gcc openssl-devel libnl3-devel net-snmp-devel
+wget https://www.keepalived.org/software/keepalived-2.2.2.tar.gz
+tar zxf keepalived-2.2.2.tar.gz
+cd keepalived-2.2.2
 ./configure --prefix=/usr/local/keepalived
 make && make install
+
+# ln -s /usr/local/keepalived-2.2.2 /usr/local/keepalived
 
 mkdir /etc/keepalived
 cp /usr/local/keepalived/etc/sysconfig/keepalived /etc/sysconfig/
@@ -298,12 +340,17 @@ cp /usr/local/keepalived/sbin/keepalived /usr/sbin/
 cp keepalived/etc/init.d/keepalived /etc/init.d/
 
 #以下是官方文档方法
-yum install gcc openssl-devel libnl3-devel net-snmp-devel
-curl --progress http://keepalived.org/software/keepalived-1.2.15.tar.gz | tar xz
-cd keepalived-1.2.15
-./configure --prefix=/usr/local/keepalived-1.2.15
+yum -y install gcc openssl-devel libnl3-devel net-snmp-devel
+curl --progress http://keepalived.org/software/keepalived-2.2.2.tar.gz | tar xz
+cd keepalived-2.2.2
+./configure --prefix=/usr/local/keepalived-2.2.2
 make
 sudo make install
+
+# yum 安装
+yum -y install keepalived
+
+
 ```
 
 vim /etc/keepalived/keepalived.conf
