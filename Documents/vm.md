@@ -206,12 +206,13 @@ sudo gitlab-ctl reconfigure
 ```shell
 # 上传jdk-8u251-linux-x64.tar.gz
 tar xzf jdk-8u251-linux-x64.tar.gz -C /usr/local/
-vim /etc/profile.d/java.sh
-
+# 注意这里的<<\EOF
+cat > /etc/profile.d/java.sh <<\EOF
 #!/bin/bash
-JAVA_HOME=/usr/local/jdk1.8.0_251
+JAVA_HOME=/usr/local/jdk1.8.0_261
 PATH=$JAVA_HOME/bin:$PATH
 export JAVA_HOME PATH
+EOF
 
 source /etc/profile
 ```
@@ -424,6 +425,19 @@ if [ `ps -C nginx --no-header | wc -l` -eq 0 ]; then    #如果nginx没有启动
               killall keepalived
       fi
 fi
+```
+
+
+
+## Kafka
+
+```shell
+# https://kafka.apache.org/downloads
+tar -xzf kafka_2.13-2.8.0.tgz
+cd kafka_2.13-2.8.0
+
+bin/zookeeper-server-start.sh config/zookeeper.properties
+bin/kafka-server-start.sh config/server.properties
 ```
 
 
