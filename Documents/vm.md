@@ -1267,6 +1267,7 @@ command <<word
 * in Netty 4 all I/O operations and events are handled by the Thread that has been assigned to the ***EventLoop***  
 * We stated earlier the importance of not blocking the current I/O thread. We’ll say it again in another way: “Never put a long-running task in the execution queue, because it will block any other task from executing on the same thread.”  
 * Once a Channel has been assigned an EventLoop, it will use this EventLoop (and the associated Thread) throughout its lifetime.   
+* Here’s a  simple guideline: use ***ByteToMessageDecoder*** if it doesn’t introduce excessive complexity; otherwise, use ***ReplayingDecoder***.  
 
 # Go
 
