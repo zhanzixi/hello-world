@@ -966,6 +966,8 @@ echo 'source <(vela completion bash)' > /etc/profile.d/vela.sh
 ## etcd
 
 ```shell
+# https://github.com/etcd-io/etcd/releases
+
 tar xzf etcd-v3.4.0-linux-amd64.tar.gz
 cd etcd-v3.4.0-linux-amd64/
 ./etcd -h
@@ -979,6 +981,7 @@ List of URLs to listen on for client traffic.
 ./etcdctl --endpoints=127.0.0.1:12379 put foo bar
 ./etcdctl --endpoints=127.0.0.1:12379 get foo
 
+# https://github.com/etcd-io/etcd/blob/main/etcd.conf.yml.sample
 ```
 
 
