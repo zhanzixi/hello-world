@@ -204,8 +204,8 @@ sudo gitlab-ctl reconfigure
 ## Java
 
 ```shell
-# 上传jdk-8u251-linux-x64.tar.gz
-tar xzf jdk-8u251-linux-x64.tar.gz -C /usr/local/
+# 上传jdk-8u261-linux-x64.tar.gz
+tar xzf jdk-8u261-linux-x64.tar.gz -C /usr/local/
 # 注意这里的<<\EOF
 cat > /etc/profile.d/java.sh <<\EOF
 #!/bin/bash
@@ -438,6 +438,26 @@ cd kafka_2.13-2.8.0
 
 bin/zookeeper-server-start.sh config/zookeeper.properties
 bin/kafka-server-start.sh config/server.properties
+```
+
+
+
+## Zookeeper
+
+```shell
+# https://zookeeper.apache.org/releases.html
+tar -xf apache-zookeeper-3.5.9-bin.tar.gz
+cd apache-zookeeper-3.5.9-bin/conf/
+cp zoo_sample.cfg zoo.cfg
+
+# Change the value of dataDir to specify an existing (empty to start with) directory
+vim zoo.cfg
+
+cd ..
+bin/zkServer.sh start
+
+# 集群部署 https://zookeeper.apache.org/doc/r3.5.9/zookeeperStarted.html
+
 ```
 
 
