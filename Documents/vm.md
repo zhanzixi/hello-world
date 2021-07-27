@@ -219,6 +219,25 @@ source /etc/profile
 
 
 
+## Hadoop
+
+```shell
+tar xzf hadoop-3.3.1.tar.gz -C /usr/local
+# 注意这里的<<\EOF
+cat > /etc/profile.d/hadoop.sh <<\EOF
+#!/bin/bash
+HADOOP_HOME=/usr/local/hadoop-3.3.1
+PATH=$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH
+export HADOOP_HOME PATH
+EOF
+
+source /etc/profile
+```
+
+
+
+
+
 ## Maven
 
 ```shell
