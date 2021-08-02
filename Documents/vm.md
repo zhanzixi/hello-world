@@ -232,6 +232,8 @@ export HADOOP_HOME PATH
 EOF
 
 source /etc/profile
+
+# https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html
 ```
 
 
