@@ -131,27 +131,43 @@ ln -s /usr/local/git-2.26.2/bin/* /usr/bin/
 
 ```
 
-```tex
-bbb
-aaa
-```
-
 
 
 ```shell
 # Beginning Git and Github.pdf
 
+# The main feature of Git is its “Three States” system. The states are the working directory, the staging area, and the git directory. So, a file goes from “modified” to “staged” to “committed.”  
+
+git checkout v2.0  # or
+git checkout master^^
+# Notice that regardless of which checkout command we use, HEAD now refers directly to commit b. This is known as being in detached HEAD state. It means simply that HEAD refers to a specific commit, as opposed to referring to a named branch.
+
+git config --global user.name "Mariot Tsitoara"
+git config --global user.email "mariot.tsitoara@gmail.com"
+# ~/.gitconfig ~/.bash_history
+
 # , you can unstage a file using the Git command “git rm” with the option “--cached.”
 git rm --cached README.md
+git restore --staged <file>...
+
+# In addition to the snapshot, a commit also contains information about the “author” of the content and the “commiter” or who put the changeset into the repository.
+
+# Remember: staging concerns only changed files you choose, while committing concerns the entire project. You stage a file; then commit the project.
+
 # To check a snapshot of the project, we use the “git checkout” command and pass the commit name as a parameter.
 git checkout <name>
 # Be careful not to change anything when checking out previous commits. Just like in the movies, changing the past is a very bad idea!
+
 #  “head” is just a reference to a commit. Instead of saying “name,” when talking about commits, we say “head.”
 # And that’s it! A head is a reference to a commit (there can be multiple heads in a repository), and the head pointing to the currently checked-out commit is called HEAD.
 git checkout master
 
+
+
 # Whatever changes committed must stay so, for the sake of history; changing what has happened in the past is very dangerous and counterintuitive. Instead, you will use git revert to create a new commit that contains the exact opposite of the commit you are trying to undo.
 git revert <commit name>
+git revert HEAD~3
+git revert -n master~5..master~2
 
  git commit --amend
  
@@ -944,6 +960,15 @@ sudo docker run --privileged -d --restart=unless-stopped -p 80:80 -p 443:443 -e 
 * You can install Rancher on a single node, or on a high-availability Kubernetes cluster.
 * 
 
+## prometheus
+
+```shell
+wget https://github.com/prometheus/prometheus/releases/download/v2.29.1/prometheus-2.29.1.linux-amd64.tar.gz
+
+tar xvfz prometheus-2.29.1.linux-amd64.tar.gz
+cd prometheus-*
+```
+
 
 
 ## Istio
@@ -1383,6 +1408,87 @@ OJ6GS5CBDX
 
 毕业证书编号： 4C2FP7DNLC
 查询地址：https://www.kaikeba.com/cert/student
+```
+
+# Spring代码流程
+
+1. org.springframework.context.annotation.**AnnotationConfigApplicationContext**
+
+```java
+public AnnotationConfigApplicationContext(Class<?>... componentClasses) {
+    this();
+    register(componentClasses);
+    refresh(); // <-
+}
+```
+
+2. org.springframework.context.support.**AbstractApplicationContext**
+
+```java
+@Override
+public void refresh() throws BeansException, IllegalStateException {
+    synchronized (this.startupShutdownMonitor) {
+        // Prepare this context for refreshing.
+        prepareRefresh();
+
+        // Tell the subclass to refresh the internal bean factory.
+        ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+
+        // Prepare the bean factory for use in this context.
+        prepareBeanFactory(beanFactory);
+
+        try {
+            // Allows post-processing of the bean factory in context subclasses.
+            postProcessBeanFactory(beanFactory);
+
+            // Invoke factory processors registered as beans in the context.
+            invokeBeanFactoryPostProcessors(beanFactory);
+
+            // Register bean processors that intercept bean creation.
+            registerBeanPostProcessors(beanFactory);
+
+            // Initialize message source for this context.
+            initMessageSource();
+
+            // Initialize event multicaster for this context.
+            initApplicationEventMulticaster();
+
+            // Initialize other special beans in specific context subclasses.
+            onRefresh();
+
+            // Check for listener beans and register them.
+            registerListeners();
+
+            // Instantiate all remaining (non-lazy-init) singletons.
+            finishBeanFactoryInitialization(beanFactory);
+
+            // Last step: publish corresponding event.
+            finishRefresh();
+        }
+
+        catch (BeansException ex) {
+            if (logger.isWarnEnabled()) {
+                logger.warn("Exception encountered during context initialization - " +
+                            "cancelling refresh attempt: " + ex);
+            }
+
+            // Destroy already created singletons to avoid dangling resources.
+            destroyBeans();
+
+            // Reset 'active' flag.
+            cancelRefresh(ex);
+
+            // Propagate exception to caller.
+            throw ex;
+        }
+
+        finally {
+            // Reset common introspection caches in Spring's core, since we
+            // might not ever need metadata for singleton beans anymore...
+            resetCommonCaches();
+        }
+    }
+}
 ```
 
 
