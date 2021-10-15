@@ -1,4 +1,8 @@
-# 软件安装
+etcd --data-dir=data.etcd --name ${THIS_NAME} \
+	--initial-advertise-peer-urls http://${THIS_IP}:2380 --listen-peer-urls http://${THIS_IP}:2380 \
+	--advertise-client-urls http://${THIS_IP}:2379 --listen-client-urls http://${THIS_IP}:2379 \
+	--initial-cluster ${CLUSTER} \
+	--initial-cluster-state ${CLUSTER_STATE} --initial-cluster-token ${TOKEN}软件安装
 
 
 
@@ -245,6 +249,11 @@ cat > /etc/profile.d/hadoop.sh <<\EOF
 HADOOP_HOME=/usr/local/hadoop-3.3.1
 PATH=$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH
 export HADOOP_HOME PATH
+export HADOOP_MAPRED_HOME=$HADOOP_HOME
+export HADOOP_COMMON_HOME=$HADOOP_HOME
+export HADOOP_HDFS_HOME=$HADOOP_HOME
+export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+export HADOOP_YARN_HOME=$HADOOP_HOME
 EOF
 
 source /etc/profile
@@ -658,6 +667,8 @@ yum install -y yum-utils device-mapper-persistent-data lvm2
 ## Add the Docker repository
 yum-config-manager --add-repo \
   https://download.docker.com/linux/centos/docker-ce.repo
+## ali repo  
+yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo 
 
 # Install Docker CE
 yum update -y && yum install -y \
@@ -723,6 +734,7 @@ sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 sudo yum install -y kubelet-1.18.2 kubeadm-1.18.2 kubectl-1.18.2 --disableexcludes=kubernetes
 #sudo yum install -y kubelet-1.19.1 kubeadm-1.19.1 kubectl-1.19.1 --disableexcludes=kubernetes
 #sudo yum install -y kubelet-1.19.0 kubeadm-1.19.0 kubectl-1.19.0 --disableexcludes=kubernetes
+#sudo yum install -y kubelet-1.22.0 kubeadm-1.22.0 kubectl-1.22.0 --disableexcludes=kubernetes
 
 sudo systemctl enable --now kubelet
 
@@ -733,6 +745,12 @@ kubeadm init \
 --pod-network-cidr 10.244.0.0/16 \
 --image-repository registry.aliyuncs.com/google_containers \
 --kubernetes-version v1.19.0
+
+kubeadm init \
+--apiserver-advertise-address 192.168.96.14 \
+--pod-network-cidr 10.244.0.0/16 \
+--image-repository registry.aliyuncs.com/google_containers \
+--kubernetes-version v1.22.0
 
 
 mkdir -p $HOME/.kube
@@ -974,18 +992,23 @@ cd prometheus-*
 ## Istio
 
 ```shell
-# https://github.com/istio/istio 下载压缩包
+# https://github.com/istio/istio 选择版本，下载压缩包
 tar xzf istio-1.7.4-linux-amd64.tar.gz
 cd istio-1.7.4
 cp bin/istioctl /usr/bin
 
 
-istioctl install --set profile=demo
+istioctl install --set profile=demo -y
 kubectl label namespace default istio-injection=enabled
 
-kubectl label namespace default istio-injection=disabled
+# kubectl label namespace default istio-injection=disabled
 # 卸载
-istioctl manifest generate --set profile=demo | kubectl delete -f -
+istioctl manifest generate --set profile=demo | kubectl delete --ignore-not-found=true -f -
+
+# Deploy the sample application
+kubectl apply -f samples/bookinfo/platform/kube/bookinfo.yaml
+kubectl get services
+kubectl get pods
 ```
 
 ```yaml
@@ -1052,6 +1075,24 @@ tar xzf etcd-v3.4.0-linux-amd64.tar.gz
 cd etcd-v3.4.0-linux-amd64/
 ./etcd -h
 
+cp etcd /usr/bin
+
+etcd --listen-client-urls http://0.0.0.0:2379 --advertise-client-urls http://0.0.0.0:2379
+
+cat > /etc/systemd/system/etcd.service <<\EOF
+[Unit]
+Description=Etcd daemon
+After=network.target 
+Wants=network.target
+   
+[Service] 
+ExecStart=/usr/bin/etcd --listen-client-urls http://0.0.0.0:2379 --advertise-client-urls http://0.0.0.0:2379
+  
+[Install] 
+WantedBy=multi-user.target
+EOF
+
+
 --listen-peer-urls 'http://localhost:2380'
 List of URLs to listen on for peer traffic.
 --listen-client-urls 'http://localhost:2379'
@@ -1062,6 +1103,111 @@ List of URLs to listen on for client traffic.
 ./etcdctl --endpoints=127.0.0.1:12379 get foo
 
 # https://github.com/etcd-io/etcd/blob/main/etcd.conf.yml.sample
+
+
+--initial-advertise-peer-urls 'http://localhost:2380'
+    List of this member's peer URLs to advertise to the rest of the cluster.
+--listen-peer-urls 'http://localhost:2380'
+    List of URLs to listen on for peer traffic.
+--advertise-client-urls 'http://localhost:2379'
+    List of this member's client URLs to advertise to the public.
+    The client URLs advertised should be accessible to machines that talk to etcd cluster. etcd client libraries parse these URLs to connect to the cluster.
+--listen-client-urls 'http://localhost:2379'
+    List of URLs to listen on for client traffic.
+    
+etcdctl \
+--cacert=/etc/kubernetes/pki/etcd/ca.crt \
+--cert=/etc/kubernetes/pki/etcd/server.crt \
+--key=/etc/kubernetes/pki/etcd/server.key \
+get / --prefix --keys-only
+```
+
+集群
+
+```shell
+#!/bin/bash
+TOKEN=token-01
+CLUSTER_STATE=new
+NAME_1=machine-1
+NAME_2=machine-2
+NAME_3=machine-3
+HOST_1=192.168.96.14
+HOST_2=192.168.96.15
+HOST_3=192.168.96.16
+CLUSTER=${NAME_1}=http://${HOST_1}:2380,${NAME_2}=http://${HOST_2}:2380,${NAME_3}=http://${HOST_3}:2380
+
+# For machine 1
+THIS_NAME=${NAME_1}
+THIS_IP=${HOST_1}
+etcd --data-dir=data.etcd --name ${THIS_NAME} \
+	--initial-advertise-peer-urls http://${THIS_IP}:2380 --listen-peer-urls http://${THIS_IP}:2380 \
+	--advertise-client-urls http://${THIS_IP}:2379 --listen-client-urls http://${THIS_IP}:2379 \
+	--initial-cluster ${CLUSTER} \
+	--initial-cluster-state ${CLUSTER_STATE} --initial-cluster-token ${TOKEN}
+	
+# For machine 2
+THIS_NAME=${NAME_2}
+THIS_IP=${HOST_2}
+etcd --data-dir=data.etcd --name ${THIS_NAME} \
+	--initial-advertise-peer-urls http://${THIS_IP}:2380 --listen-peer-urls http://${THIS_IP}:2380 \
+	--advertise-client-urls http://${THIS_IP}:2379 --listen-client-urls http://${THIS_IP}:2379 \
+	--initial-cluster ${CLUSTER} \
+	--initial-cluster-state ${CLUSTER_STATE} --initial-cluster-token ${TOKEN}
+
+# For machine 3
+THIS_NAME=${NAME_3}
+THIS_IP=${HOST_3}
+etcd --data-dir=data.etcd --name ${THIS_NAME} \
+	--initial-advertise-peer-urls http://${THIS_IP}:2380 --listen-peer-urls http://${THIS_IP}:2380 \
+	--advertise-client-urls http://${THIS_IP}:2379 --listen-client-urls http://${THIS_IP}:2379 \
+	--initial-cluster ${CLUSTER} \
+	--initial-cluster-state ${CLUSTER_STATE} --initial-cluster-token ${TOKEN}
+	
+## 服务化
+cat > /etc/systemd/system/etcd.service <<\EOF
+[Unit]
+Description=Etcd daemon
+After=network.target 
+Wants=network.target
+   
+[Service] 
+Type=forking
+ExecStart=etcd --data-dir=data.etcd --name ${THIS_NAME} \
+	--initial-advertise-peer-urls http://${THIS_IP}:2380 --listen-peer-urls http://${THIS_IP}:2380 \
+	--advertise-client-urls http://${THIS_IP}:2379 --listen-client-urls http://${THIS_IP}:2379 \
+	--initial-cluster ${CLUSTER} \
+	--initial-cluster-state ${CLUSTER_STATE} --initial-cluster-token ${TOKEN}
+  
+[Install] 
+WantedBy=multi-user.target
+EOF
+```
+
+openssl
+
+```shell
+cp /etc/pki/tls/openssl.cnf .
+
+# 生成ca根证书私钥
+openssl genrsa -out ca.key 2048
+# 生成ca根证书请求文件
+openssl req -new -key ca.key -out ca.csr -subj /CN=etcd.example.com
+# 自己作为ca机构签发根证书（自签发证书）
+openssl x509 -req -days 365 -signkey ca.key -in ca.csr -out ca.crt
+
+# 生成server端私钥
+openssl genrsa -out server.key 2048
+# 生成server端证书请求文件
+openssl req -new -key server.key -out server.csr -subj /CN=etcd.example.com
+# 2.3 使用ca根证书为server端签发证书
+# touch /etc/pki/CA/index.txt
+# echo "01" > /etc/pki/CA/serial
+openssl ca -in server.csr -out server.crt -cert ca.crt -keyfile ca.key -config openssl.cnf
+
+# 生成client端私钥
+openssl genrsa -out client.key 2048
+openssl req -new -key client.key -out client.csr -subj /CN=etcd.example.com
+openssl ca -in client.csr -out client.crt -cert ca.crt -keyfile ca.key -config openssl.cnf
 ```
 
 
