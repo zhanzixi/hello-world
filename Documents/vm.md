@@ -361,8 +361,59 @@ mkdir /usr/local/haproxy/conf
 cp examples/option-http_proxy.cfg /usr/local/haproxy/conf/haproxy.cfg
 ln -s /usr/local/haproxy/sbin/haproxy /usr/sbin/haproxy
 
-# 配置参考
+################################ 配置参考 ################################
 # http://cbonte.github.io/haproxy-dconv/2.4/configuration.html#2.6
+
+###################### 以下根据官方文档整理 haproxy-2.4.0/INSTALL ######################
+yum groupinstall -y "Development Tools"
+wget https://www.haproxy.org/download/2.4/src/haproxy-2.4.0.tar.gz
+tar -xf haproxy-2.4.0.tar.gz
+cd haproxy-2.4.0
+make clean
+
+# USE_OPENSSL=1 USE_PCRE=1 USE_SYSTEMD=1
+yum install -y openssl-devel pcre-devel systemd-devel
+# USE_LUA=1
+curl -R -O https://www.lua.org/ftp/lua-5.3.6.tar.gz
+tar zxf lua-5.3.6.tar.gz
+cd lua-5.3.6
+yum install -y libtermcap-devel ncurses-devel libevent-devel readline-devel
+make linux
+make install
+
+make -j $(nproc) TARGET=linux-glibc USE_OPENSSL=1 USE_LUA=1 USE_PCRE=1 USE_SYSTEMD=1 
+make install
+
+# 该文件是yum install -y haproxy 自动生成的
+cat <<EOF | sudo tee /etc/systemd/system/haproxy.service
+[Unit]
+Description=HAProxy Load Balancer
+After=syslog.target network.target
+
+[Service]
+EnvironmentFile=/etc/sysconfig/haproxy
+ExecStart=/usr/sbin/haproxy-systemd-wrapper -f /etc/haproxy/haproxy.cfg -p /run/haproxy.pid $OPTIONS
+ExecReload=/bin/kill -USR2 $MAINPID
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+
+# 这是修改后的
+cat <<EOF | sudo tee /etc/systemd/system/haproxy.service
+[Unit]
+Description=HAProxy Load Balancer
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/sbin/haproxy -f /etc/haproxy/haproxy.cfg
+
+[Install]
+WantedBy=multi-user.target
+EOF
 ```
 
 
@@ -393,9 +444,29 @@ cd keepalived-2.2.2
 ./configure --prefix=/usr/local/keepalived-2.2.2
 make
 sudo make install
+# install后就有keepalived.service了，可以进行查看
+mkdir /etc/keepalived
+cp /usr/local/keepalived/etc/keepalived/keepalived.conf /etc/keepalived/
+
 
 # yum 安装
 yum -y install keepalived
+# 
+
+[Unit]
+Description=LVS and VRRP High Availability Monitor
+After=syslog.target network-online.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/keepalived.pid
+KillMode=process
+EnvironmentFile=-/etc/sysconfig/keepalived
+ExecStart=/usr/sbin/keepalived $KEEPALIVED_OPTIONS
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target
 
 
 ```
