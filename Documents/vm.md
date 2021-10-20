@@ -322,7 +322,7 @@ chown -R tomcat:tomcat /usr/local/apache-tomcat-9.0.8
 yum -y install gcc gcc-c++ pcre-devel openssl-devel
 wget http://nginx.org/download/nginx-1.20.1.tar.gz
 tar -xf nginx-1.20.1.tar.gz
-./configure
+./configure --with-http_ssl_module
 make && make install
 
 # https://www.nginx.com/resources/wiki/start/topics/examples/systemd/
@@ -838,12 +838,10 @@ cat > /etc/docker/daemon.json <<EOF
 }
 EOF
 
-mkdir -p /etc/systemd/system/docker.service.d
-
 # Restart Docker
-systemctl daemon-reload
-systemctl restart docker
 sudo systemctl enable docker
+sudo systemctl daemon-reload
+sudo systemctl restart docker
 
 # 5. Installing kubeadm, kubelet and kubectl (install these packages on all of your machines)
 cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
@@ -891,6 +889,13 @@ kubeadm init \
 
 kubeadm init \
 --apiserver-advertise-address 192.168.96.14 \
+--pod-network-cidr 10.244.0.0/16 \
+--image-repository registry.aliyuncs.com/google_containers \
+--kubernetes-version v1.22.0
+
+kubeadm init \
+--control-plane-endpoint "192.168.96.99:8081" \
+--upload-certs \
 --pod-network-cidr 10.244.0.0/16 \
 --image-repository registry.aliyuncs.com/google_containers \
 --kubernetes-version v1.22.0
