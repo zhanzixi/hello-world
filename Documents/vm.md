@@ -382,7 +382,27 @@ make linux
 make install
 
 make -j $(nproc) TARGET=linux-glibc USE_OPENSSL=1 USE_LUA=1 USE_PCRE=1 USE_SYSTEMD=1 
-make install
+make install PREFIX=/usr/local/haproxy
+
+mkdir /usr/local/haproxy/conf
+touch /usr/local/haproxy/conf/haproxy.cfg
+
+# systemd服务化
+cat <<EOF | sudo tee /etc/systemd/system/haproxy.service
+[Unit]
+Description=HAProxy Load Balancer
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/haproxy/sbin/haproxy -f /usr/local/haproxy/conf/haproxy.cfg
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl enable --now haproxy
+
 
 # 该文件是yum install -y haproxy 自动生成的
 cat <<EOF | sudo tee /etc/systemd/system/haproxy.service
@@ -399,21 +419,30 @@ KillMode=mixed
 [Install]
 WantedBy=multi-user.target
 EOF
+```
 
+例子haproxy.cfg
 
-# 这是修改后的
-cat <<EOF | sudo tee /etc/systemd/system/haproxy.service
-[Unit]
-Description=HAProxy Load Balancer
-After=network.target
+```groovy
+    global
+        daemon
+        maxconn 256
+         
+    defaults
+        mode http
+        timeout connect 5000ms
+        timeout client 50000ms
+        timeout server 50000ms
+		stats enable
 
-[Service]
-Type=forking
-ExecStart=/usr/local/sbin/haproxy -f /etc/haproxy/haproxy.cfg
+    frontend http-in
+        bind *:8080
+        default_backend servers
 
-[Install]
-WantedBy=multi-user.target
-EOF
+    backend servers
+        option httpchk GET /
+        server server1 192.168.96.14:80 maxconn 32 check inter 1000
+        server server2 192.168.96.15:80 maxconn 32 check inter 1000
 ```
 
 
@@ -437,17 +466,18 @@ cp /usr/local/keepalived/etc/keepalived/keepalived.conf /etc/keepalived/
 cp /usr/local/keepalived/sbin/keepalived /usr/sbin/
 cp keepalived/etc/init.d/keepalived /etc/init.d/
 
-#以下是官方文档方法
-yum -y install gcc openssl-devel libnl3-devel net-snmp-devel
+################ 以下是官方文档方法 ################
+yum -y install curl gcc openssl-devel libnl3-devel net-snmp-devel
 curl --progress http://keepalived.org/software/keepalived-2.2.2.tar.gz | tar xz
 cd keepalived-2.2.2
 ./configure --prefix=/usr/local/keepalived-2.2.2
 make
 sudo make install
-# install后就有keepalived.service了，可以进行查看
+# install后就有keepalived.service了，可以进行查看 /usr/lib/systemd/system/keepalived.service
 mkdir /etc/keepalived
-cp /usr/local/keepalived/etc/keepalived/keepalived.conf /etc/keepalived/
+cp /usr/local/keepalived-2.2.2/etc/keepalived/keepalived.conf /etc/keepalived/
 
+systemctl enable --now keepalived
 
 # yum 安装
 yum -y install keepalived
@@ -542,6 +572,48 @@ if [ `ps -C nginx --no-header | wc -l` -eq 0 ]; then    #如果nginx没有启动
               killall keepalived
       fi
 fi
+```
+
+```perl
+! Configuration File for keepalived
+global_defs {
+    router_id LVS_DEVEL
+}
+vrrp_script check_apiserver {
+  script "/etc/keepalived/check_apiserver.sh"
+  interval 3
+  weight -2
+  fall 10
+  rise 2
+}
+
+vrrp_instance VI_1 {
+    state MASTER
+    interface ens33
+    virtual_router_id 51
+    priority 101
+    authentication {
+        auth_type PASS
+        auth_pass 42
+    }
+    virtual_ipaddress {
+        192.168.96.99
+    }
+    track_script {
+        check_apiserver
+    }
+}
+```
+
+```bash
+#!/bin/bash
+
+errorExit() {
+    echo "*** $*" 1>&2
+    exit 1
+}
+
+curl --silent --max-time 2 http://localhost:8080/ -o /dev/null || errorExit "Error GET https://localhost:8080/"
 ```
 
 
