@@ -371,6 +371,7 @@ tar -xf haproxy-2.4.0.tar.gz
 cd haproxy-2.4.0
 make clean
 
+cd ..
 # USE_OPENSSL=1 USE_PCRE=1 USE_SYSTEMD=1
 yum install -y openssl-devel pcre-devel systemd-devel
 # USE_LUA=1
@@ -381,7 +382,8 @@ yum install -y libtermcap-devel ncurses-devel libevent-devel readline-devel
 make linux
 make install
 
-make -j $(nproc) TARGET=linux-glibc USE_OPENSSL=1 USE_LUA=1 USE_PCRE=1 USE_SYSTEMD=1 
+cd ../haproxy-2.4.0
+make -j $(nproc) TARGET=linux-glibc USE_OPENSSL=1 USE_LUA=1 USE_PCRE=1 USE_SYSTEMD=1
 make install PREFIX=/usr/local/haproxy
 
 mkdir /usr/local/haproxy/conf
@@ -391,11 +393,11 @@ touch /usr/local/haproxy/conf/haproxy.cfg
 cat <<EOF | sudo tee /etc/systemd/system/haproxy.service
 [Unit]
 Description=HAProxy Load Balancer
-After=network.target
+After=syslog.target network.target
 
 [Service]
-Type=forking
-ExecStart=/usr/local/haproxy/sbin/haproxy -f /usr/local/haproxy/conf/haproxy.cfg
+ExecStartPre=/usr/local/haproxy/sbin/haproxy -f /usr/local/haproxy/conf/haproxy.cfg -c
+ExecStart=/usr/local/haproxy/sbin/haproxy -Ws -f /usr/local/haproxy/conf/haproxy.cfg
 
 [Install]
 WantedBy=multi-user.target
@@ -893,13 +895,19 @@ kubeadm init \
 --image-repository registry.aliyuncs.com/google_containers \
 --kubernetes-version v1.22.0
 
-kubeadm init \
---control-plane-endpoint "192.168.96.99:8081" \
---upload-certs \
---pod-network-cidr 10.244.0.0/16 \
+# 集群安装
+kubeadm config images pull \
 --image-repository registry.aliyuncs.com/google_containers \
 --kubernetes-version v1.22.0
 
+sysctl -w net.ipv4.ip_forward=1
+
+kubeadm init \
+--control-plane-endpoint "192.168.96.99:16443" \
+--pod-network-cidr 10.244.0.0/16 \
+--image-repository registry.aliyuncs.com/google_containers \
+--kubernetes-version v1.22.0 \
+--upload-certs
 
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
@@ -927,6 +935,8 @@ kubeadm join 192.168.220.16:6443 --token 1n9k6j.8ritutnllll5irdh \
     --discovery-token-ca-cert-hash sha256:5fbf246a2a8f6323471aee1ec8d12a0ead3277710e9808f6642e83b6d1aa438a
     1n9k6j.8ritutnllll5irdh
     5fbf246a2a8f6323471aee1ec8d12a0ead3277710e9808f6642e83b6d1aa438a
+    
+  
 ```
 
 ### ingress-nginx
@@ -1216,6 +1226,8 @@ echo 'source <(vela completion bash)' > /etc/profile.d/vela.sh
 
 ## etcd
 
+###  单机
+
 ```shell
 # https://github.com/etcd-io/etcd/releases
 
@@ -1270,7 +1282,7 @@ etcdctl \
 get / --prefix --keys-only
 ```
 
-集群
+### 集群
 
 ```shell
 #!/bin/bash
