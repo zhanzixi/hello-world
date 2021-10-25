@@ -80,6 +80,65 @@ GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'MyNewPass4!' WITH GRANT
 SET GLOBAL TRANSACTION ISOLATION LEVEL READ COMMITTED
 ```
 
+### 冷备份
+
+```shell
+# 停机
+SET GLOBAL innodb_fast_shutdown=0
+shutdown
+
+# 拷贝整个/var/lib/mysql目录
+scp -r /var/lib/mysql root@192.168.96.14:/root
+# 改变用户
+chown -R mysql:mysql mysql
+cp -r mysql /var/lib/mysql
+systemctl start mysqld
+```
+
+### 热备份
+
+```shell
+Group: mysql, Title: innobackupex 备份 8.0 的mysql, Password: ********, Creation Time: 2021/9/30 16:21:34, Last Modification Time: 2021/10/9 17:13:51
+
+1.下载 innobackupex
+https://downloads.percona.com/downloads/Percona-XtraBackup-LATEST/Percona-XtraBackup-8.0.26-18/binary/redhat/7/x86_64/percona-xtrabackup-80-8.0.26-18.1.el7.x86_64.rpm
+
+2.安装 innobackupex
+yum -y install percona-xtrabackup-80-8.0.26-18.1.el7.x86_64.rpm
+
+安装 XtraBackup 中出现"libev.so.4()(64bit) is needed"问题
+wget ftp://rpmfind.net/linux/atrpms/el6-x86_64/atrpms/stable/libev-4.04-2.el6.x86_64.rpm
+
+
+rpm -ivh libev-4.04-2.el6.x86_64.rpm
+
+3.备份
+innobackupex --defaults-file=/etc/mysql/my-3466.cnf --user=root --password=M@3LRhnfKc6U%A --socket=/var/lib/mysql/mysql-3466.sock --no-timestamp --backup --target-dir=/data/tmp/3466
+
+注：
+--backup         指明是备份
+--target-dir     备份目标目录
+
+4. 恢复
+## MySQL 5.6/5.7
+innobackupex --defaults-file=/home/mysql/data/backup-my.cnf --apply-log /home/mysql/data
+
+## MySQL 8.0
+xtrabackup --prepare --target-dir=/data/tmp/3466
+
+xtrabackup --datadir=/data/mysql-3466 --copy-back --target-dir=/data/tmp/3466
+```
+
+### 逻辑备份
+
+```shell
+mysqldump --databases --single-transaction --flush-logs --master-data=2 test1 -p > test1.sql
+
+scp test1.sql root@192.168.96.14:/root
+
+mysql -uroot -p < test1.sql
+```
+
 
 
 ## Redis
