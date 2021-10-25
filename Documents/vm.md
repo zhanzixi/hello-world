@@ -629,6 +629,38 @@ cd kafka_2.13-2.8.0
 
 bin/zookeeper-server-start.sh config/zookeeper.properties
 bin/kafka-server-start.sh config/server.properties
+
+# 服务化
+cat <<EOF | sudo tee /etc/systemd/system/kafka.service
+[Unit]
+Requires=network.target remote-fs.target
+After=network.target remote-fs.target
+
+[Service]
+Type=simple
+ExecStart=/opt/kafka/bin/zookeeper-server-start.sh /opt/kafka/config/zookeeper.properties
+ExecStop=/opt/kafka/bin/zookeeper-server-stop.sh
+Restart=on-abnormal
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# 集群部署
+broker.id=0
+listeners=PLAINTEXT://192.168.96.14:9092
+log.dir=/var/lib/kafka-logs
+zookeeper.connect=192.168.96.14:2181
+
+broker.id=1
+listeners=PLAINTEXT://192.168.96.15:9092
+log.dir=/var/lib/kafka-logs
+zookeeper.connect=192.168.96.14:2181
+
+broker.id=2
+listeners=PLAINTEXT://192.168.96.16:9092
+log.dir=/var/lib/kafka-logs
+zookeeper.connect=192.168.96.14:2181
 ```
 
 
@@ -648,7 +680,18 @@ cd ..
 bin/zkServer.sh start
 
 # 集群部署 https://zookeeper.apache.org/doc/r3.5.9/zookeeperStarted.html
+# https://zookeeper.apache.org/doc/r3.6.3/zookeeperAdmin.html#sc_zkMulitServerSetup 
 
+tickTime=2000
+dataDir=/var/lib/zookeeper/
+clientPort=2181
+initLimit=5
+syncLimit=2
+server.1=zoo1:2888:3888
+server.2=zoo2:2888:3888
+server.3=zoo3:2888:3888
+
+echo 1 ? /var/lib/zookeeper/myid
 ```
 
 
