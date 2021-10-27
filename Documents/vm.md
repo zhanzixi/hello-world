@@ -133,10 +133,60 @@ xtrabackup --datadir=/data/mysql-3466 --copy-back --target-dir=/data/tmp/3466
 
 ```shell
 mysqldump --databases --single-transaction --flush-logs --master-data=2 test1 -p > test1.sql
+# master-data可能过时 source-data替换
 
 scp test1.sql root@192.168.96.14:/root
 
 mysql -uroot -p < test1.sql
+```
+
+### 时间点恢复
+
+```mysql
+show variables like '%log_bin%';
+show variables like 'binlog_expire_logs_seconds';
+SHOW BINARY LOGS;
+SHOW MASTER STATUS;
+# binlog.000004 |      156 
+
+# binlog.000005 |     2049
+
+# 查看binlog，找出需要恢复的时间段，需要跳过的时间段
+mysqlbinlog /var/lib/mysql/binlog.000005 --base64-output=decode-rows -v
+857
+1425
+--start-position=156 --stop-position=857
+--start-position=1425 --stop-position=2049
+
+mysqlbinlog /var/lib/mysql/binlog.000005 --start-position=156 --stop-position=857 | mysql -uroot -p
+mysqlbinlog /var/lib/mysql/binlog.000005 --start-position=1425 --stop-position=2049 | mysql -uroot -p
+```
+
+### 复制
+
+```mysql
+# https://dev.mysql.com/doc/refman/8.0/en/replication-howto.html
+# Setting the Replication Source Configuration
+server_id=4
+# Setting the Replica Configuration
+server_id=14
+# Creating a User for Replication
+GRANT REPLICATION SLAVE ON *.* TO 'root'@'%';
+#Obtaining the Replication Source Binary Log Coordinates
+SHOW MASTER STATUS;
+# binlog.000287 |      368
+
+mysqldump --all-databases --single-transaction --flush-logs --master-data=2 -p > mysql4.sql
+
+CHANGE REPLICATION SOURCE TO
+    SOURCE_HOST='192.168.96.4',
+    SOURCE_USER='root',
+    SOURCE_PASSWORD='MyNewPass4!',
+    SOURCE_LOG_FILE='binlog.000288',
+    SOURCE_LOG_POS=156;
+SHOW REPLICA STATUS\G
+
+
 ```
 
 
