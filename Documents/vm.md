@@ -184,8 +184,30 @@ CHANGE REPLICATION SOURCE TO
     SOURCE_PASSWORD='MyNewPass4!',
     SOURCE_LOG_FILE='binlog.000288',
     SOURCE_LOG_POS=156;
+    
+START REPLICA;
 SHOW REPLICA STATUS\G
 
+
+################################
+FLUSH TABLES WITH READ LOCK;
+UNLOCK TABLES;
+select * from mysql.slave_master_info;
+select * from mysql.slave_relay_log_info;
+```
+
+### GTID复制
+
+```mysql
+# 配置文件source replica都配置如下
+gtid_mode=ON
+enforce-gtid-consistency=ON
+
+CHANGE REPLICATION SOURCE TO
+	SOURCE_HOST = '192.168.96.4',
+    SOURCE_USER='root',
+    SOURCE_PASSWORD='MyNewPass4!',
+    SOURCE_AUTO_POSITION = 1;
 
 ```
 
