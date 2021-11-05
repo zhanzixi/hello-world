@@ -1165,6 +1165,18 @@ docker run -e spring.datasource.url="jdbc:mysql://172.30.37.30:3326/xxl_job?useU
 
 ```
 
+### metrics-server
+
+```shell
+# https://github.com/kubernetes-sigs/metrics-server
+wget https://github.com/kubernetes-sigs/metrics-server/releases/download/metrics-server-helm-chart-3.6.0/components.yaml
+# 编辑components.yaml中的镜像registry.aliyuncs.com/google_containers/metrics-server:v0.5.1
+# 增加参数--kubelet-insecure-tls
+kubectl apply -f components.yaml
+```
+
+
+
 ### Kubernetes in Action
 
 - A ReplicaSet behaves exactly like a ReplicationController, but it has more expressive pod selectors. Whereas a ReplicationController’s label selector only allows matching pods that include a certain label, a ReplicaSet’s selector also allows matching pods that lack a certain label or pods that include a certain label key, regardless of its value.  
@@ -1274,6 +1286,16 @@ cd filebeat-7.9.0-linux-x86_64
 
 
 
+## Metricbeat
+
+```shell
+curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-7.9.0-linux-x86_64.tar.gz
+tar xf metricbeat-7.9.0-linux-x86_64.tar.gz
+cd metricbeat-7.9.0-linux-x86_64/
+```
+
+
+
 ## Gitea
 
 ```shell
@@ -1317,6 +1339,10 @@ wget https://github.com/prometheus/prometheus/releases/download/v2.29.1/promethe
 
 tar xvfz prometheus-2.29.1.linux-amd64.tar.gz
 cd prometheus-*
+
+
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
 ```
 
 
