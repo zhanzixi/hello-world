@@ -1594,6 +1594,22 @@ npm config set registry https://registry.npm.taobao.org/
   * Minor releases: `1` or `1.x` or `^1.0.4`
   * Major releases: `*` or `x`
 
+## openssl
+
+```shell
+# https://www.openssl.org/source/ 
+wget https://www.openssl.org/source/openssl-3.0.0.tar.gz
+tar xf openssl-3.0.0.tar.gz
+yum install -y perl-core
+cd openssl-3.0.0
+./Configure --prefix=/usr/local/ssl --openssldir=/usr/local/ssl '-Wl,-rpath,$(LIBRPATH)'
+make
+make install
+
+# 用 OpenSSL 创建可以用于 https 的证书
+# https://blog.csdn.net/joyous/article/details/80659925
+```
+
 
 
 # 韩顺平Linux视频教程2018版
